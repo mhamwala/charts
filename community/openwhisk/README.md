@@ -2,21 +2,26 @@
 Apache OpenWhisk is an open source, distributed serverless platform that executes functions in response to events at any scale.
 
 ## Introduction
-This chart ...
+This chart is for deploying Apache OpenWhisk to your Kubernetes cluster.
+[Add more] 
 * Paragraph overview of the workload
 * Include links to external sources for more product info
 * Don't say "for ICP" or "Cloud Private" the chart should remain a general chart not directly stating ICP or ICS. 
 
 ## Chart Details
+[Add more]
 * Simple bullet list of what is deployed as the standard config
 * General description of the topology of the workload 
 * Keep it short and specific with items such as : ingress, services, storage, pods, statefulsets, etc. 
 
 ## Prerequisites
 * Kubernetes 1.10 - 1.11.*
+[Add more]
 * PersistentVolume requirements (if persistence.enabled) - PV provisioner support, StorageClass defined, etc. (i.e. PersistentVolume provisioner support in underlying infrastructure with ibmc-file-gold StorageClass defined if persistance.enabled=true)
+[Add more]
 * Simple bullet list of CPU, MEM, Storage requirements
 * Even if the chart only exposes a few resource settings, this section needs to inclusive of all / total resources of all charts and subcharts.
+[In Progress]
 * Describe any custom image policy requirements if using a non-whitelisted image repository.
 
 ### PodSecurityPolicy Requirements
@@ -28,40 +33,40 @@ This chart requires a PodSecurityPolicy to be bound to the target namespace prio
     apiVersion: extensions/v1beta1
     kind: PodSecurityPolicy
     metadata:
+        name: ibm-anyuid-hostpath-psp
     annotations:
         kubernetes.io/description: "This policy allows pods to run with 
         any UID and GID and any volume, including the host path.  
         WARNING:  This policy allows hostPath volumes.  
         Use with caution." 
-    name: ibm-anyuid-hostpath-psp
     spec:
-    allowPrivilegeEscalation: true
-    fsGroup:
-        rule: RunAsAny
-    requiredDropCapabilities: 
-    - MKNOD
-    allowedCapabilities:
-    - SETPCAP
-    - AUDIT_WRITE
-    - CHOWN
-    - NET_RAW
-    - DAC_OVERRIDE
-    - FOWNER
-    - FSETID
-    - KILL
-    - SETUID
-    - SETGID
-    - NET_BIND_SERVICE
-    - SYS_CHROOT
-    - SETFCAP 
-    runAsUser:
-        rule: RunAsAny
-    seLinux:
-        rule: RunAsAny
-    supplementalGroups:
-        rule: RunAsAny
-    volumes:
-    - '*'
+        allowPrivilegeEscalation: true
+        fsGroup:
+            rule: RunAsAny
+        requiredDropCapabilities: 
+        - MKNOD
+        allowedCapabilities:
+        - SETPCAP
+        - AUDIT_WRITE
+        - CHOWN
+        - NET_RAW
+        - DAC_OVERRIDE
+        - FOWNER
+        - FSETID
+        - KILL
+        - SETUID
+        - SETGID
+        - NET_BIND_SERVICE
+        - SYS_CHROOT
+        - SETFCAP 
+        runAsUser:
+            rule: RunAsAny
+        seLinux:
+            rule: RunAsAny
+        supplementalGroups:
+            rule: RunAsAny
+        volumes:
+        - '*'
     ```
 
 * Custom ClusterRole for the custom PodSecurityPolicy:
@@ -70,18 +75,19 @@ This chart requires a PodSecurityPolicy to be bound to the target namespace prio
   apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    name: ibm-chart-dev-clusterrole
+    name: ibm-chart-hostpath-clusterrole
   rules:
   - apiGroups:
     - extensions
     resourceNames:
-    - ibm-chart-dev-psp
+    - ibm-anyuid-hostpath-psp
     resources:
     - podsecuritypolicies
     verbs:
     - use
   ```
 
+[Add more - can we delete?]
 ### Prereq configuration scripts can be used to create and delete required resources:
 _WRITER NOTES: Include instructions on where to find the prereq scripts based on whether PPA or github.com based chart._
 
@@ -99,7 +105,22 @@ _(For PPA based) Find the following scripts in pak_extensions/prereqs directory 
     - Example usage: `./deleteSecurityNamespacePrereqs.sh myNamespace`
 
 ## Resources Required
+[Add more]
 * Describes Minimum System Resources Required
+
+## Initial setup
+
+1. Identify the Kubernetes worker nodes that should be used to execute
+user containers.  Do this by labeling each node with
+`openwhisk-role=invoker`.  For a single node cluster, simply do
+```shell
+kubectl label nodes --all openwhisk-role=invoker
+```
+If you have a multi-node cluster, for each node <INVOKER_NODE_NAME>
+you want to be an invoker, execute
+```shell
+$ kubectl label nodes <INVOKER_NODE_NAME> openwhisk-role=invoker
+```
 
 ## Installing the Chart
 * Include at the basic things necessary to install the chart from the Helm CLI - the general happy path
@@ -111,7 +132,7 @@ _(For PPA based) Find the following scripts in pak_extensions/prereqs directory 
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install --tls --namespace <your pre-created namespace> --name my-release community/openwhisk
+$ helm install --tls --namespace <your pre-created namespace> --name my-release community/openwhisk --set whisk.ingress.apiHostName=<your ip address>
 ```
 
 The command deploys Openwhisk on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
@@ -125,6 +146,10 @@ The command deploys Openwhisk on the Kubernetes cluster in the default configura
 
 ### Verifying the Chart
 See NOTES.txt associated with this chart for verification instructions
+To verify your deployment has run successfully run:
+```bash
+helm test <release name>
+```
 
 ### Uninstalling the Chart
 
@@ -198,3 +223,13 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 ## Documentation
 * Can have as many supporting links as necessary for this specific workload however don't overload the consumer with unnecessary information.
 * Can be links to special procedures in the knowledge center.
+
+# Disclaimer
+Apache OpenWhisk Deployment on Kubernetes is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
+
+
+# Support
+For questions, hints, and tips for developing in Apache OpenWhisk:
+
+[Join the Dev Mailing List](https://openwhisk.apache.org/community.html#mailing-lists)
+[Follow OpenWhisk Media](https://openwhisk.apache.org/community.html#social)
