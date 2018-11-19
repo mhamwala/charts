@@ -3,6 +3,7 @@ Apache OpenWhisk is an open source, distributed serverless platform that execute
 
 ## Introduction
 This chart is for deploying Apache OpenWhisk to your Kubernetes cluster.
+
 [Add more] 
 * Paragraph overview of the workload
 * Include links to external sources for more product info
@@ -16,11 +17,14 @@ This chart is for deploying Apache OpenWhisk to your Kubernetes cluster.
 
 ## Prerequisites
 * Kubernetes 1.10 - 1.11.*
+
 [Add more]
 * PersistentVolume requirements (if persistence.enabled) - PV provisioner support, StorageClass defined, etc. (i.e. PersistentVolume provisioner support in underlying infrastructure with ibmc-file-gold StorageClass defined if persistance.enabled=true)
+
 [Add more]
 * Simple bullet list of CPU, MEM, Storage requirements
 * Even if the chart only exposes a few resource settings, this section needs to inclusive of all / total resources of all charts and subcharts.
+
 [In Progress]
 * Describe any custom image policy requirements if using a non-whitelisted image repository.
 
